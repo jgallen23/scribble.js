@@ -1,5 +1,6 @@
 !function(obj, util) {
   var Fidel = (typeof ender === "undefined")?obj.Fidel:$.Fidel;
+  var touchSupport = ("createTouch" in document);
   var Scribble = Fidel.extend({
     init: function() {
       var self = this;
@@ -19,12 +20,9 @@
     },
     /* DRAWING */
     events: {
-      "mousedown": "_start",
-      "mousemove": "_move",
-      "mouseup": "_end",
-      "touchstart": "_start",
-      "touchmove": "_move",
-      "touchend": "_end"
+      "_start": (touchSupport)?"touchstart":"mousedown",
+      "_move": (touchSupport)?"touchmove":"mousemove",
+      "_end": (touchSupport)?"touchend":"mouseup"
     },
     _getPoint: function(ev) {
       var x,y;
@@ -34,8 +32,8 @@
         this._offset = [this.el[0].offsetLeft + margin, this.el[0].offsetTop + margin];
       }
       if (ev.touches) {
-        x = ev.touches[0].clientX - this.offset[0] - window.scrollX;
-        y = ev.touches[0].clientY - this.offset[1] - window.scrollY;
+        x = ev.touches[0].clientX - this._offset[0] - window.scrollX;
+        y = ev.touches[0].clientY - this._offset[1] - window.scrollY;
       } else {
         x = ev.clientX - this._offset[0];
         y = ev.clientY - this._offset[1];
